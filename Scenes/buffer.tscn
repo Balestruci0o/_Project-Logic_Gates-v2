@@ -1,0 +1,27 @@
+[gd_scene load_steps=4 format=3 uid="uid://catqvwo2x6tmu"]
+
+[ext_resource type="Script" path="res://Scripts/buffer.gd" id="1_jlvtn"]
+[ext_resource type="PackedScene" uid="uid://bjpccy0a5gemn" path="res://Scenes/dot.tscn" id="3_oeayd"]
+[ext_resource type="Texture2D" uid="uid://yjp7tfvtnhfx" path="res://Graphics/BUFFER_GATE_OFF.png" id="3_pmgk6"]
+
+[node name="Buffer" type="Area2D"]
+script = ExtResource("1_jlvtn")
+
+[node name="Buffer" type="Sprite2D" parent="."]
+position = Vector2(1, 3)
+scale = Vector2(0.275781, 0.275781)
+texture = ExtResource("3_pmgk6")
+
+[node name="CollisionPolygon2D" type="CollisionPolygon2D" parent="."]
+position = Vector2(2.75, 2.5)
+polygon = PackedVector2Array(-39.75, -48.5, 38.25, -5.5, 37.25, 5.5, -40.75, 50.5)
+
+[node name="dot2" parent="." instance=ExtResource("3_oeayd")]
+position = Vector2(85, 1)
+
+[node name="dot" parent="." instance=ExtResource("3_oeayd")]
+position = Vector2(-84, 3)
+
+[connection signal="input_event" from="." to="." method="_on_input_event"]
+[connection signal="mouse_entered" from="." to="." method="_on_mouse_entered"]
+[connection signal="mouse_exited" from="." to="." method="_on_mouse_exited"]
