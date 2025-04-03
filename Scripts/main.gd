@@ -12,7 +12,7 @@ var drawing := false
 var start_pos: Vector2
 var viewport_size = Vector2.ZERO
 
-var dragging_connector: Node2D = null
+var dragging_connector: Array
 var selection_box: ColorRect = null  # Premenná na výberový box
 var selection_start: Vector2  # Začiatočná pozícia výberu
 
@@ -41,49 +41,77 @@ func correct_camera_position() -> void:
 func _input(event) -> void:
 	if event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT:
 		var mouse_pos = get_global_mouse_position()
-		
+
 		if event.pressed:
 			var clicked_connector = get_dot_at_position(mouse_pos)
 			var clicked_cable = get_cable_at_position(mouse_pos)
 
-			if clicked_connector:
-				dragging_connector = clicked_connector
-			elif clicked_cable:
-				if Input.is_key_pressed(KEY_CTRL):
+			if Input.is_key_pressed(KEY_ALT):
+				start_drawing(mouse_pos)
+
+			elif Input.is_key_pressed(KEY_CTRL):
+				if clicked_connector:
+					start_drawing(mouse_pos)
+
+				elif clicked_cable:
 					if clicked_cable in selected_objects:
 						selected_objects.erase(clicked_cable)
 					else:
 						selected_objects.append(clicked_cable)
 
+			elif Input.is_key_pressed(KEY_SHIFT):
+				if clicked_connector:
+					dragging_connector.clear()
+					dragging_connector.append(get_all_dots_at_position(clicked_connector.position)[0])
 				else:
-					selected_objects = [clicked_cable]
-				print(selected_objects)
-			else:
-				selected_objects.clear()
-				if Input.is_key_pressed(KEY_SHIFT):
+					# Držím SHIFT → výberový box (ako doteraz)
 					start_selection(mouse_pos)
-				else:
-					start_drawing(mouse_pos)
+
+			elif clicked_connector:
+				selected_objects.erase(clicked_cable)
+				selected_objects.append(clicked_cable)
+				dragging_connector = get_all_dots_at_position(clicked_connector.position)
+				
+			elif clicked_cable:
+				selected_objects.clear()
+				selected_objects.append(clicked_cable)
+			else:
+				camera.start_moving(mouse_pos)
+				selected_objects.clear()
+
 		else:
+			# Pustenie tlačidla myši
 			if selection_box:
 				finalize_selection()
 			else:
 				stop_drawing()
-			dragging_connector = null
+			dragging_connector.clear()
+			camera.stop_moving()
 
 	elif event is InputEventMouseMotion:
 		var mouse_pos = get_global_mouse_position()
+
 		if dragging_connector:
 			move_connector(mouse_pos)
 		elif drawing:
 			update_drawing(mouse_pos)
 		elif selection_box:
 			update_selection(mouse_pos)
+		elif camera.is_moving:
+			camera.update_position(event.position)
 
-	elif event is InputEventKey and event.pressed and event.keycode == KEY_DELETE:
+	elif event is InputEventKey and event.pressed and (event.keycode == KEY_DELETE or event.keycode == KEY_BACKSPACE):
 		delete_selected_cables()
 
-
+func get_all_dots_at_position(pos) -> Array:
+	var found_dots = []
+	for cable_data in cables:
+		print(cable_data["start"].position)
+		if cable_data["start"].position == pos:
+			found_dots.append(cable_data["start"])
+		if cable_data["end"].position == pos:
+			found_dots.append(cable_data["end"])
+	return found_dots
 
 func start_selection(mouse_pos: Vector2) -> void:
 	if selection_box:  # Ak už existuje, odstráň ho
@@ -184,15 +212,25 @@ func stop_drawing() -> void:
 	drawing = false
 
 func move_connector(new_pos: Vector2) -> void:
-	if not is_instance_valid(dragging_connector):
+	if dragging_connector.is_empty():
 		return
 
 	var aligned_pos = align_to_grid(new_pos)
-	dragging_connector.position = aligned_pos
 
-	var affected_cables = cables.filter(func(c): return c["start"] == dragging_connector or c["end"] == dragging_connector)
+	# Posun všetkých ťahaných konektorov
+	for connector in dragging_connector:
+		if is_instance_valid(connector):
+			connector.position = aligned_pos
+
+	# Nájdeme všetky káble, ktoré sú pripojené k posunutým konektorom
+	var affected_cables = []
+	for connector in dragging_connector:
+		affected_cables.append_array(cables.filter(func(c): return c["start"] == connector or c["end"] == connector))
+
+	# Aktualizácia káblov
 	for cable_data in affected_cables:
 		update_cable(cable_data)
+
 
 
 func update_cable(cable_data) -> void:
