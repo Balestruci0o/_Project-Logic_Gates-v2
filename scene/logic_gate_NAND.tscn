@@ -1,0 +1,29 @@
+[gd_scene load_steps=4 format=3 uid="uid://cgu3s277g6cpc"]
+
+[ext_resource type="Script" uid="uid://xqu5xwhffoc1" path="res://Scripts/logic_gate_NAND.gd" id="1_h4x1w"]
+[ext_resource type="Texture2D" uid="uid://dy3j8ye1geoml" path="res://Graphics/Logic_Gate_NAND.png" id="2_765rg"]
+[ext_resource type="PackedScene" uid="uid://wd4jomd5vy63" path="res://Scenes/dot.tscn" id="3_1f3wx"]
+
+[node name="Logic_Gate_NAND" type="Area2D"]
+script = ExtResource("1_h4x1w")
+
+[node name="NandGate" type="Sprite2D" parent="."]
+position = Vector2(6, 1)
+texture = ExtResource("2_765rg")
+
+[node name="dot" parent="." instance=ExtResource("3_1f3wx")]
+position = Vector2(96, 1)
+
+[node name="dot2" parent="." instance=ExtResource("3_1f3wx")]
+position = Vector2(-65, 32)
+
+[node name="dot3" parent="." instance=ExtResource("3_1f3wx")]
+position = Vector2(-66, -31)
+
+[node name="CollisionPolygon2D" type="CollisionPolygon2D" parent="."]
+position = Vector2(-28, -28)
+polygon = PackedVector2Array(-13, -11, 50, -12, 68, -3, 80, 10, 82, 22, 93, 22, 96, 32, 82, 36, 78, 47, 70, 58, 49, 68, -14, 67)
+
+[connection signal="input_event" from="." to="." method="_on_input_event"]
+[connection signal="mouse_entered" from="." to="." method="_on_mouse_entered"]
+[connection signal="mouse_exited" from="." to="." method="_on_mouse_exited"]

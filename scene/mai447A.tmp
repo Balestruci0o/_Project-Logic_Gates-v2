@@ -1,0 +1,42 @@
+[gd_scene load_steps=11 format=3 uid="uid://c5y5trrlbnmlp"]
+
+[ext_resource type="Script" path="res://Scripts/main.gd" id="1_q7re3"]
+[ext_resource type="Texture2D" uid="uid://cjk2t48e8rat1" path="res://Graphics/patern.svg" id="2_egqio"]
+[ext_resource type="Texture2D" uid="uid://cfgn3l1wiaoxv" path="res://Graphics/GRID2.svg" id="2_tk4ve"]
+[ext_resource type="Script" path="res://Scripts/tile_map_layer.gd" id="3_pq2df"]
+[ext_resource type="Texture2D" uid="uid://xmn27folgwro" path="res://Graphics/grid.svg" id="4_bid4p"]
+[ext_resource type="PackedScene" uid="uid://cgvo3u22x8pll" path="res://Scenes/camera.tscn" id="4_s2v7k"]
+
+[sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_73gqg"]
+texture = ExtResource("2_egqio")
+texture_region_size = Vector2i(32, 32)
+0:0/0 = 0
+
+[sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_6f1n4"]
+texture = ExtResource("2_tk4ve")
+texture_region_size = Vector2i(32, 32)
+0:0/0 = 0
+1:0/0 = 0
+0:1/0 = 0
+1:1/0 = 0
+
+[sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_266br"]
+texture = ExtResource("4_bid4p")
+texture_region_size = Vector2i(32, 32)
+0:0/0 = 0
+
+[sub_resource type="TileSet" id="TileSet_txc71"]
+tile_size = Vector2i(32, 32)
+sources/1 = SubResource("TileSetAtlasSource_6f1n4")
+sources/0 = SubResource("TileSetAtlasSource_73gqg")
+sources/2 = SubResource("TileSetAtlasSource_266br")
+
+[node name="Main" type="Node2D"]
+script = ExtResource("1_q7re3")
+
+[node name="TileMapLayer" type="TileMapLayer" parent="."]
+tile_set = SubResource("TileSet_txc71")
+script = ExtResource("3_pq2df")
+
+[node name="Camera" parent="." instance=ExtResource("4_s2v7k")]
+position = Vector2(140.434, 42.401)

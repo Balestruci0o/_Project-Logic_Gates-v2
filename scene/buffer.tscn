@@ -1,0 +1,92 @@
+[gd_scene load_steps=4 format=3 uid="uid://c57gv1vblfmi4"]
+
+[ext_resource type="PackedScene" uid="uid://wd4jomd5vy63" path="res://Scenes/dot.tscn" id="3_oeayd"]
+
+[sub_resource type="GDScript" id="GDScript_v3ayo"]
+script/source = "extends Area2D
+
+signal is_mouse_entered
+signal is_mouse_exited
+
+var is_being_dragged := false
+
+
+const TILE_SIZE = 32  # alebo 64, podľa tvojho gridu
+
+func snap_to_grid(pos: Vector2) -> Vector2:
+	return Vector2(
+		round(pos.x / TILE_SIZE) * TILE_SIZE,
+		round(pos.y / TILE_SIZE) * TILE_SIZE
+	)
+
+#func _ready() -> void:
+	#$dot.in_out = \"in\"
+	#$dot2.in_out = \"out\"
+	#for child in get_children(): 
+		#if child is Area2D:  
+			#child.connect(\"is_mouse_entered\", Callable(self, \"_on_area_mouse_entered\"))
+			#child.connect(\"is_mouse_exited\", Callable(self, \"_on_area_mouse_exited\"))
+#
+#func update_ele():
+	##print($dot2.updated && $dot.updated)
+	#if $dot.updated:
+		#print($\".\", \"je updated\")
+		#$dot2.updated = true
+		#$dot2.ele = $dot.ele
+		#if $dot.ele:
+			#$Buffer.texture = load(\"res://Graphics/BUFFER_GATE_ON.png\")
+		#else:
+			#$Buffer.texture = load(\"res://Graphics/BUFFER_GATE_OFF.png\")
+	#else:
+		#print($\".\", \"nie je updated\")
+		#$Buffer.texture = load(\"res://Graphics/BUFFER_GATE_OFF.png\")
+		#$dot2.ele = false
+		#$dot2.updated = false
+	#$dot2.update_ele($dot2.ele, $dot2.updated)
+
+
+func _on_area_mouse_entered(area_name: Node2D):
+	emit_signal(\"is_mouse_entered\", area_name)
+
+func _on_area_mouse_exited():
+	emit_signal(\"is_mouse_exited\")
+
+func _on_input_event(_viewport: Node, event: InputEvent, _shape_idx: int) -> void:
+	if event is InputEventMouseButton:
+		if event.button_index == MOUSE_BUTTON_LEFT:
+			if event.pressed:
+				is_being_dragged = true
+				get_parent().selected_objects.clear()
+				get_parent().selected_objects.append($\".\")
+				print(get_parent().selected_objects)
+			else:
+				is_being_dragged = false
+
+	elif event is InputEventMouseMotion:
+		if is_being_dragged:
+			global_position = snap_to_grid(get_global_mouse_position())
+"
+
+[sub_resource type="CompressedTexture2D" id="CompressedTexture2D_skvw6"]
+
+[node name="Buffer" type="Area2D"]
+script = SubResource("GDScript_v3ayo")
+
+[node name="Buffer" type="Sprite2D" parent="."]
+position = Vector2(1, 3)
+scale = Vector2(0.275781, 0.275781)
+texture = SubResource("CompressedTexture2D_skvw6")
+
+[node name="CollisionPolygon2D" type="CollisionPolygon2D" parent="."]
+position = Vector2(2.75, 2.5)
+polygon = PackedVector2Array(-39.75, -48.5, 38.25, -5.5, 37.25, 5.5, -40.75, 50.5)
+
+[node name="dot2" parent="." instance=ExtResource("3_oeayd")]
+position = Vector2(85, 1)
+
+[node name="dot" parent="." instance=ExtResource("3_oeayd")]
+position = Vector2(-84, 3)
+
+[connection signal="input_event" from="." to="." method="_on_input_event"]
+[connection signal="mouse_entered" from="." to="." method="_on_mouse_entered"]
+[connection signal="mouse_exited" from="." to="." method="_on_mouse_exited"]
