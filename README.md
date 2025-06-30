@@ -68,6 +68,6 @@ This project is protected under a **custom license**:
 - You **may view and study the code** for educational and non-commercial purposes only.
 - If you want to use any part of this project, you must obtain **explicit written permission** from the author.
 
-© Martin Pavlik, 2025 — All rights reserved.
+© Martin Pavlik, Matúš Kuruc, Dominik Klokočka, 2025 — All rights reserved.
 
 ---
